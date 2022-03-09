@@ -25,13 +25,15 @@ class TreeCell(Agent):
         self.pos = pos
         self.condition = "Fine"
         self.size = "Small"
+        self.catchesFire = 0.80
+        self.bigEnough = False
 
     def step(self):
         """
         If the tree is on fire, spread it to fine trees nearby.
         """
-        if self.condition == "On Fire" and self.size == "Small":
+        if self.condition == "On Fire" and self.bigEnough == False:
             for neighbor in self.model.grid.neighbor_iter(self.pos):
-                if neighbor.condition == "Fine":
+                if neighbor.condition == "Fine" and neighbor.bigEnough == False:
                     neighbor.condition = "On Fire"
             self.condition = "Burned Out"

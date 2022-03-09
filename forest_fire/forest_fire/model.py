@@ -28,6 +28,8 @@ class ForestFire(Model):
                 "Fine": lambda m: self.count_type(m, "Fine"),
                 "On Fire": lambda m: self.count_type(m, "On Fire"),
                 "Burned Out": lambda m: self.count_type(m, "Burned Out"),
+                "Big": lambda m: self.count_type(m, "Big"),
+                "Small": lambda m: self.count_type(m, "Small")
             }
         )
 
@@ -36,8 +38,14 @@ class ForestFire(Model):
             if self.random.random() < density:
                 # Create a tree
                 new_tree = TreeCell((x, y), self)
+                # Tree is Big with Prob = size and 
+                # for each Big tree, there is a Prob = 0.35
+                # that they will catch on fire
                 if self.random.random() < size:
                     new_tree.size = "Big"
+                    new_tree.catchesFire = 0.35
+                    if self.random.random() < new_tree.catchesFire:
+                        new_tree.bigEnough = True
                 # Set all trees in the first column on fire.
                 if x == 0:
                     new_tree.condition = "On Fire"
@@ -67,5 +75,7 @@ class ForestFire(Model):
         count = 0
         for tree in model.schedule.agents:
             if tree.condition == tree_condition:
+                count += 1
+            if tree.size == tree_condition:
                 count += 1
         return count

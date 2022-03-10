@@ -1,9 +1,14 @@
 from mesa import Model
+from mesa import Agent
 from mesa.datacollection import DataCollector
 from mesa.space import Grid
 from mesa.time import RandomActivation
+from random import randrange
+from decimal import Decimal
+from mesa.batchrunner import BatchRunner
+from datetime import datetime
 
-from .agent import TreeCell
+from agent import TreeCell
 
 
 class ForestFire(Model):
@@ -79,3 +84,73 @@ class ForestFire(Model):
             if tree.size == tree_condition:
                 count += 1
         return count
+
+def big(model):
+    count = 0
+    for tree in model.schedule.agents:
+            if tree.size == "Big":
+                count += 1
+    return count
+
+def small(model):
+    count = 0
+    for tree in model.schedule.agents:
+        if tree.size == "Small":
+            count += 1
+    return count
+
+def onFire(model):
+    count = 0
+    for tree in model.schedule.agents:
+        if tree.condition == "On Fire":
+            count += 1
+    return count
+
+def fine(model):
+    count = 0
+    for tree in model.schedule.agents:
+        if tree.condition == "Fine":
+            count += 1
+    return count
+
+def burned(model):
+    count = 0
+    for tree in model.schedule.agents:
+        if tree.condition == "Burned Out":
+            count += 1
+    return count
+
+def batch_run():
+    fix_params={
+        "width":100,
+        "height":100,
+    }
+    variable_params={
+        "density": [0.25, 0.5, 0.75],
+        "size": [0.2, 0.3, 0.4]
+    }
+    batch_run = BatchRunner(
+        ForestFire,
+        variable_parameters=variable_params,
+        fixed_parameters=fix_params,
+        iterations=10,
+        max_steps=100,
+        model_reporters={
+            "Big": big,
+            "Small": small,
+            "Fine": fine,
+            "On Fire": onFire,
+            "Burned": burned
+        }
+    )
+    batch_run.run_all()
+
+    run_model_data = batch_run.get_model_vars_dataframe()
+    #run_agent_data = batch_run.get_agent_vars_dataframe() 
+
+    now = datetime.now().strftime("%Y-%m-%d")
+    file_name_suffix =  ("iter"+str(10)+
+                        "steps"+str(100)+"lower_firemans"+now
+                        )
+    run_model_data.to_csv("model_data"+file_name_suffix+".csv")
+    #run_agent_data.to_csv("agent_data"+file_name_suffix+".csv")

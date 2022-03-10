@@ -1,41 +1,33 @@
-# Forest Fire Model
+# Modelo Forest Fire
 
-## Summary
+## Resumo
 
-The [forest fire model](http://en.wikipedia.org/wiki/Forest-fire_model) is a simple, cellular automaton simulation of a fire spreading through a forest. The forest is a grid of cells, each of which can either be empty or contain a tree. Trees can be unburned, on fire, or burned. The fire spreads from every on-fire tree to unburned neighbors; the on-fire tree then becomes burned. This continues until the fire dies out.
+O [forest fire model](http://en.wikipedia.org/wiki/Forest-fire_model) é um modelo simples que simula o fogo alastrando por uma floresta, a qual é uma grade de células as quais podem ser vazias ou conter uma árvore. As árvores podem estar pegando fogo, queimadas ou não queimadas. O fogo se espalha de cada árvore que esteja pegando fogo para árvores vizinhas que não estejam queimadas e então, aquela se torna queimada. Isso continua até que não tenha mais árvores pegando fogo.
 
-## How to Run
+A modificação aqui realizada, busca trazer uma nova variável para o modelo: o tamanho da árvore. Para cada célula com uma árvore, existe uma chance daquela ser grande, além disso, para cada árvore grande, existe uma chance menor de pegar fogo quando comparada a uma árvore pequena. Essa modificação pretende direcionar o modelo para a realidade, onde nem todas as árvores pegam fogo da mesma maneira, de forma que em algumas regiões da floresta, por mais que estejam queimadas as árvores em volta, algumas árvores permanecem, dependendo de sua resistência, grossura do casco e outros fatores.
 
-To run the model interactively, run ``mesa runserver`` in this directory. e.g.
+## Como inicializar o servidor
+
+Para rodar o modelo, execute o comando no diretório do projeto:
 
 ```
     $ mesa runserver
 ```
 
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
-
-To view and run the model analyses, use the ``Forest Fire Model`` Notebook.
-
-## Files
+## Arquivos
 
 ### ``forest_fire/model.py``
 
-This defines the model. There is one agent class, **TreeCell**. Each TreeCell object which has (x, y) coordinates on the grid, and its condition is *Fine* by default. Every step, if the tree's condition is *On Fire*, it spreads the fire to any *Fine* trees in its [Von Neumann neighborhood](http://en.wikipedia.org/wiki/Von_Neumann_neighborhood) before changing its own condition to *Burned Out*.
+Este arquivo possui as definições do modelo, onde estão contidos os agentes **TreeCell**, o qual possui coordenadas (x, y), condition (*Fine*, *On Fire* e *Burned Out*) e size (*Small* ou *Big*). Em cada criação da árvore, existe uma chance da mesma ser *Small* ou *Big* e, para cada árvore *Big* existe uma chance menor da mesma pegar fogo, quando comparada a uma árvore *Small*. Em cada passo, se a condition é *On Fire*, o fogo se espalha para as árvores vizinhas (de acordo com [Von Neumann neighborhood](http://en.wikipedia.org/wiki/Von_Neumann_neighborhood) que atenderem a probabilidade de pegar fogo de acordo com o tamanho.
 
-The **ForestFire** class is the model container. It is instantiated with width and height parameters which define the grid size, and density, which is the probability of any given cell having a tree in it. When a new model is instantiated, cells are randomly filled with trees with probability equal to density. All the trees in the left-hand column (x=0) are set to *On Fire*.
+A classe **ForestFire** representa o recipiente do modelo, é instanciado com os parâmetros width, height e size, que definem, respectivamente, o tamanho da grade, a densidade (que é a probabilidade de cada célula possuir uma árvore) e o tamanho da árvore (probabilidade de cada árvore ser *Big*). Quando um modelo é instanciado, cada célula possui uma probabilidade = densidade de conter uma árvore e, para cada célula que contenha uma árvore, existe uma probabilidade = size da mesma ser *Big*. Além disso, todas as árvores na primeira coluna (x = 0) possuem o estado *On Fire*
 
-Each step of the model, trees are activated in random order, spreading the fire and burning out. This continues until there are no more trees on fire -- the fire has completely burned out.
+Em cada passo, as árvores são ativadas aleatoriamente, espalhando o fogo e queimando. Isso se repete até que não existam mais árvores no estado *On Fire*.
 
 
 ### ``forest_fire/server.py``
 
-This code defines and launches the in-browser visualization for the ForestFire model. It includes the **forest_fire_draw** method, which takes a TreeCell object as an argument and turns it into a portrayal to be drawn in the browser. Each tree is drawn as a rectangle filling the entire cell, with a color based on its condition. *Fine* trees are green, *On Fire* trees red, and *Burned Out* trees are black.
+Este arquivo define e inicializa a visualização do modelo no navegador, que transforma o objeto de TreeCell em portrayal, desenhando no navegador. Cada árvore é um retângulo na grade, onde a cor mostra seu estado: verde para *Fine*, vermelho para *On Fire* e preto para *Burned Out*.
 
-## Further Reading
-
-Read about the Forest Fire model on Wikipedia: http://en.wikipedia.org/wiki/Forest-fire_model
-
-This is directly based on the comparable NetLogo model:
-
-Wilensky, U. (1997). NetLogo Fire model. http://ccl.northwestern.edu/netlogo/models/Fire. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+Além disso, nos gráficos abaixo da grade, podemos ver, para cada passo da simulação, a quantidade de árvores para cada estado e para cada tamanho de árvore.
 
